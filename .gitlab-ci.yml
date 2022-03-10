@@ -1,0 +1,7 @@
+stages:
+  - test
+
+test:all:
+  extends:
+    - .s3-test
+    - .localstack-runner

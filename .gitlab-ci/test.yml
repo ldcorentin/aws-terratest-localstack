@@ -1,0 +1,30 @@
+include:
+  - local: /.gitlab-ci/**.yml
+
+.install-golang: &install-golang
+  script:
+    - echo "Install golang..."
+    - apk add --no-cache go
+    - GOROOT=/usr/lib/go
+    - GOPATH=/go
+    - PATH=/go/bin:$PATH
+    - mkdir -p ${GOPATH}/src ${GOPATH}/bin
+
+.terratest-module: &terratest-module
+  script:
+    - cd test/terratest
+    - go mod init s3
+    - go mod tidy
+    - go test -v
+
+.s3-test:
+  stage: test
+  image: hashicorp/terraform:1.1.5
+  script:
+    - cd s3
+    - !reference [.install-golang, script]
+    - !reference [.terratest, script]
+
+  services:
+    - name: localstack/localstack
+      alias: localhost
