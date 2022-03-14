@@ -65,9 +65,6 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: 1.17.7
-      - name: Download Go Modules
-        working-directory: test/terratest
-        run: go mod download
       - name: Run Go Tests
         working-directory: test/terratest
         run: go test -v
