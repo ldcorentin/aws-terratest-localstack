@@ -64,8 +64,14 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.16.6
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Test
-        run: TF_ACC=true go test -v terraform/terratest/
+          go-version: 1.17.7
+      - name: Download Go Modules
+        working-directory: test/terratest
+        run: go mod download
+      - name: Run Go Tests
+        working-directory: test/terratest
+        run: go test -v
+      # - name: Checkout code
+      #   uses: actions/checkout@v2
+      # - name: Test
+      #   run: TF_ACC=true go test -v terraform/terratest/
