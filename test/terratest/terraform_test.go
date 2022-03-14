@@ -2,6 +2,8 @@ package test
 // github.com/gruntwork-io/terratest v0.40.6
 import (
 	"testing"
+	"reflect"
+	"fmt"
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
@@ -48,7 +50,7 @@ func getVersioning(bucketVersioningID string) (resp *s3.GetBucketVersioningOutpu
 	return resp
 }
 
-func TestTerraformS3(t *testing.T) {
+func TestTerraformS3Versionning(t *testing.T) {
 	t.Parallel()
 
 	terraformOptions := configureTerraformOptions(t)
@@ -77,4 +79,21 @@ func TestTerraformS3(t *testing.T) {
 	// Versioning testing
 	versioning := getVersioning(bucketVersioningID)
 	assert.Equal(t, *versioning.Status, "Enabled")
+
+	nullVersioning := getVersioning(bucketID)
+	assert.Equal(t, reflect.Indirect(reflect.ValueOf(*nullVersioning)).Type().Field(0).Name, "_")
+	// assert.Equal(t, reflect.Indirect(reflect.ValueOf(&nullVersioning)).Type().Field(0).Name, true) // s3.GetBucketVersioningOutput{"no versioning"})
+	fmt.Println(*nullVersioning)
 }
+
+// terraform_test.go:83:
+// Error Trace:	terraform_test.go:83
+// Error:      	Not equal:
+// 				expected: *s3.GetBucketVersioningOutput({
+
+// 				})
+// 				actual  : <nil>(<nil>)
+// Test:       	TestTerraformS3Versionning
+// {
+
+// }
