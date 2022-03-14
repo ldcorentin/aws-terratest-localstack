@@ -46,6 +46,7 @@ jobs:
           github_token: ${{ secrets.github_token }}
           flags: "-c .tflint.hcl"
           fail_on_error: "true"
+          reporter: github-check
           filter_mode: "nofilter"
   terratest:
     runs-on: ubuntu-18.04
