@@ -1,0 +1,56 @@
+on: [push, pull_request]
+name: Test
+jobs:
+  test:
+    runs-on: ubuntu-16.04
+    steps:
+      - uses: hashicorp/setup-terraform@v1
+        name: Setup Terraform
+        with:
+          terraform_version: 1.1.5
+      - uses: actions/checkout@v2
+        name: Checkout source code
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check
+        working-directory: module
+  tf-validate:
+    runs-on: ubuntu-16.04
+    steps:
+      - uses: hashicorp/setup-terraform@v1
+        name: Setup Terraform
+        with:
+          terraform_version: 1.1.5
+      - uses: actions/checkout@v2
+        name: Checkout source code
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+        working-directory: module
+  tf-lint:
+    runs-on: ubuntu-16.04
+    steps:
+      - uses: hashicorp/setup-terraform@v1
+        name: Setup Terraform
+        with:
+          terraform_version: 1.1.5
+      - uses: actions/checkout@v2
+        name: Checkout source code
+      - name: tflint
+        uses: reviewdog/action-tflint@v1
+        with:
+          github_token: ${{ secrets.github_token }}
+          flags: "-c .tflint.hcl"
+          fail_on_error: "true"
+          filter_mode: "nofilter"
+  tests:
+    runs-on: ubuntu-16.04
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Test
+        run: TF_ACC=true go test -v klayers/*
