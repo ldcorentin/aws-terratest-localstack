@@ -50,6 +50,16 @@ jobs:
           filter_mode: "nofilter"
   terratest:
     runs-on: ubuntu-18.04
+    services:
+      ## Localstack
+      ## All the containers in a job are connected to the same Docker network. This means you can access other containers using their network alias (we assign the network alias based on the service name)
+      localhost:
+        image: localstack/localstack:latest
+        env:
+          SERVICES: sts,s3
+          DEFAULT_REGION: eu-west-1
+        ports:
+          - 4566:4566
     steps:
       - name: Install Go
         uses: actions/setup-go@v2
@@ -58,4 +68,4 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Test
-        run: TF_ACC=true go test -v terraform/terratest/*
+        run: TF_ACC=true go test -v terraform/terratest/
