@@ -1,0 +1,4 @@
+# Runners
+.localstack-runner:
+  tags:
+    - localstack
