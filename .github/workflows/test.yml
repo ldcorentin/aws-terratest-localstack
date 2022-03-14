@@ -2,7 +2,7 @@ on: [push, pull_request]
 name: Test
 jobs:
   terraform-format:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-18.04
     steps:
       - uses: hashicorp/setup-terraform@v1
         name: Setup Terraform
@@ -15,7 +15,7 @@ jobs:
         run: terraform fmt -check
         working-directory: module
   terraform-validate:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-18.04
     steps:
       - uses: hashicorp/setup-terraform@v1
         name: Setup Terraform
@@ -28,7 +28,7 @@ jobs:
         run: terraform validate -no-color
         working-directory: module
   terraform-lint:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-18.04
     steps:
       - uses: hashicorp/setup-terraform@v1
         name: Setup Terraform
@@ -44,7 +44,7 @@ jobs:
           fail_on_error: "true"
           filter_mode: "nofilter"
   terratest:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-18.04
     steps:
       - name: Install Go
         uses: actions/setup-go@v2
