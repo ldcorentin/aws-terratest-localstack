@@ -1,3 +1,6 @@
+# Articles
+articles/*
+
 # Local .terraform directories
 **/.terraform/*
 
