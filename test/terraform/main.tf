@@ -6,13 +6,11 @@ module "test" {
   environment = var.environment
 }
 
-module "test_versionning" {
+module "test_versioning" {
   source = "../../module"
 
   project            = var.project
-  name               = "s3-versionning"
+  name               = "s3-versioning"
   environment        = var.environment
   versioning_enabled = true
-  # versioning_mfa        = ""
-  # versioning_mfa_delete = "Disabled"
 }

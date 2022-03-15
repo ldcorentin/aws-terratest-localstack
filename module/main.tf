@@ -24,7 +24,7 @@ data "aws_iam_policy_document" "policy" {
 
   ## Policy statement to prevent unsecure access to the bucket
   statement {
-    sid    = "Deny-non-secure-transport"
+    sid    = "AllowSSLRequestsOnly"
     effect = "Deny"
     actions = [
       "s3:*"

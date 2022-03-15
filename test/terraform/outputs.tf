@@ -6,10 +6,10 @@ output "simple_arn" {
   value = module.test.arn
 }
 
-# Versionning bucket
-output "versionning_id" {
-  value = module.test_versionning.id
+# versioning bucket
+output "versioning_id" {
+  value = module.test_versioning.id
 }
-output "versionning_arn" {
-  value = module.test_versionning.arn
+output "versioning_arn" {
+  value = module.test_versioning.arn
 }
