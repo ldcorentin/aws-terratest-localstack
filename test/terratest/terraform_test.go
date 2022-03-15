@@ -1,57 +1,59 @@
 package test
+
 // github.com/gruntwork-io/terratest v0.40.6
 import (
-	"testing"
-	"reflect"
-	"encoding/json"
-	"io"
-	"fmt"
 	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"reflect"
+	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/aws/aws-sdk-go/aws"
-    "github.com/aws/aws-sdk-go/aws/session"
-    "github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 )
 
 const LocalstackEndpoint = "http://localhost:4566"
-const REGION 			 = "eu-west-1"
+const REGION = "eu-west-1"
+
 var s3session *s3.S3
 
 func init() {
-    s3session = s3.New(session.Must(session.NewSession(&aws.Config{
-        Region:   aws.String(REGION),
-        Endpoint: aws.String(LocalstackEndpoint),
+	s3session = s3.New(session.Must(session.NewSession(&aws.Config{
+		Region:           aws.String(REGION),
+		Endpoint:         aws.String(LocalstackEndpoint),
 		S3ForcePathStyle: aws.Bool(true),
-    })))
+	})))
 }
 
 func configureTerraformOptions(t *testing.T, target string) *terraform.Options {
 	return terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		// The path to where our Terraform code is located
 		TerraformDir: "../terraform/",
-	
+
 		// Variables to pass to our Terraform code using -var-file options
 		VarFiles: []string{"varfile.tfvars"},
-	
+
 		// Disable colors in Terraform commands so its easier to parse stdout/stderr
 		NoColor: true,
-		
+
 		// Test targets
-        Targets: []string{target},
+		Targets: []string{target},
 	})
 }
 
 func getVersioning(bucketVersioningID string) (resp *s3.GetBucketVersioningOutput) {
-    resp, err := s3session.GetBucketVersioning(&s3.GetBucketVersioningInput{
+	resp, err := s3session.GetBucketVersioning(&s3.GetBucketVersioningInput{
 		Bucket: aws.String(bucketVersioningID),
 	})
 
 	if err != nil {
-        panic(err)
-    }
+		panic(err)
+	}
 
 	return resp
 }
@@ -68,9 +70,9 @@ func TestTerraformS3(t *testing.T) {
 	terraform.InitAndApply(t, terraformOptions)
 
 	// Run `terraform output` to get the values of output variables
-  	bucketID := terraform.Output(t, terraformOptions, "simple_id")
-  	bucketARN := terraform.Output(t, terraformOptions, "simple_arn")
-	
+	bucketID := terraform.Output(t, terraformOptions, "simple_id")
+	bucketARN := terraform.Output(t, terraformOptions, "simple_arn")
+
 	// Output testing
 	assert.Equal(t, "aws-modules-testing-s3-simple-localstack-eu-west-1", bucketID)
 	assert.Equal(t, "arn:aws:s3:::aws-modules-testing-s3-simple-localstack-eu-west-1", bucketARN)
@@ -92,9 +94,9 @@ func TestTerraformS3Versioning(t *testing.T) {
 	terraform.InitAndApply(t, terraformOptions)
 
 	// Run `terraform output` to get the values of output variables
-  	bucketVersioningID := terraform.Output(t, terraformOptions, "versioning_id")
-  	bucketVersioningARN := terraform.Output(t, terraformOptions, "versioning_arn")
-	
+	bucketVersioningID := terraform.Output(t, terraformOptions, "versioning_id")
+	bucketVersioningARN := terraform.Output(t, terraformOptions, "versioning_arn")
+
 	// Output testing
 	assert.Equal(t, "aws-modules-testing-s3-versioning-localstack-eu-west-1", bucketVersioningID)
 	assert.Equal(t, "arn:aws:s3:::aws-modules-testing-s3-versioning-localstack-eu-west-1", bucketVersioningARN)
@@ -116,9 +118,9 @@ func TestTerraformS3Interactions(t *testing.T) {
 	terraform.InitAndApply(t, terraformOptions)
 
 	// Run `terraform output` to get the values of output variables
-  	bucketID := terraform.Output(t, terraformOptions, "simple_id")
-  	bucketARN := terraform.Output(t, terraformOptions, "simple_arn")
-	
+	bucketID := terraform.Output(t, terraformOptions, "simple_id")
+	bucketARN := terraform.Output(t, terraformOptions, "simple_arn")
+
 	// Output testing
 	assert.Equal(t, "aws-modules-testing-s3-simple-localstack-eu-west-1", bucketID)
 	assert.Equal(t, "arn:aws:s3:::aws-modules-testing-s3-simple-localstack-eu-west-1", bucketARN)
@@ -165,18 +167,18 @@ func TestTerraformS3Interactions(t *testing.T) {
 	assert.Equal(t, respBody, body)
 
 	_, err = s3session.DeleteObject(&s3.DeleteObjectInput{
-        Bucket: aws.String(bucketID),
+		Bucket: aws.String(bucketID),
 		Key:    aws.String("test"),
-    })
-    if err != nil {
-        fmt.Println(err)
-    }
+	})
+	if err != nil {
+		fmt.Println(err)
+	}
 
-    err = s3session.WaitUntilObjectNotExists(&s3.HeadObjectInput{
-        Bucket: aws.String(bucketID),
+	err = s3session.WaitUntilObjectNotExists(&s3.HeadObjectInput{
+		Bucket: aws.String(bucketID),
 		Key:    aws.String("test"),
-    })
-    if err != nil {
-        fmt.Println(err)
-    }
+	})
+	if err != nil {
+		fmt.Println(err)
+	}
 }
