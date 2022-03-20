@@ -1,0 +1,32 @@
+version: 2
+
+references:
+  test_container_config: &test_container_config
+    docker:
+      - image: corentindoc/terratest:latest
+      - image: localstack/localstack:latest
+        environment:
+          DEBUG: 1
+          SERVICES: s3,sts
+
+jobs:
+  test:
+    <<: *test_container_config
+    steps:
+      - checkout
+      - run:
+          name: "Terratest"
+          command: |
+            cd test/terratest
+            go get -v -t -d && go mod tidy
+            go test -v
+          environment:
+            AWS_ACCESS_KEY_ID: "null"
+            AWS_SECRET_ACCESS_KEY: "null"
+
+
+workflows:
+  version: 2
+  main:
+    jobs:
+      - test
